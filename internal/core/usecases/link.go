@@ -14,32 +14,39 @@ type linkUseCase struct {
 	log  *logger.Logger
 }
 
-func (t *linkUseCase) FindAll() ([]domain.Link, error) {
-	result, err := t.repo.FindAll()
+func (l *linkUseCase) FindAll() ([]domain.Link, error) {
+	result, err := l.repo.FindAll()
 	if err != nil {
-		t.log.Error(err)
+		l.log.Error(err)
 		return nil, err
 	}
 
 	return result, nil
 }
 
-func (t *linkUseCase) FindByID(id string) (*domain.Link, error) {
-	result, err := t.repo.FindByID(id)
+func (l *linkUseCase) FindByID(id string) (*domain.Link, error) {
+	result, err := l.repo.FindByID(id)
 	if err != nil {
-		t.log.Error(err)
+		l.log.Error(err)
 		return nil, err
 	}
 
 	return result, nil
 }
 
-func (t *linkUseCase) Create(original string) (*domain.Link, error) {
-	link := domain.NewLink(helpers.NewShortID(), original, time.Now())
+func (l *linkUseCase) Create(original string) (*domain.Link, error) {
+	// Check existence
+	link, _ := l.repo.FindByOriginal(original)
+	if link != nil {
+		return link, nil
+	}
 
-	result, err := t.repo.Create(link)
+	// Create new
+	link = domain.NewLink(helpers.NewShortID(), original, time.Now())
+
+	result, err := l.repo.Create(link)
 	if err != nil {
-		t.log.Error(err)
+		l.log.Error(err)
 		return nil, err
 	}
 

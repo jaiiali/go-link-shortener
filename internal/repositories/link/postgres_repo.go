@@ -1,6 +1,7 @@
 package link
 
 import (
+	"crypto/md5"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -133,11 +134,14 @@ func (r *PostgresRepo) FindByOriginal(original string) (*domain.Link, error) {
 	SELECT
 		id, original, created_at
 	FROM links
-	WHERE original = $1
+	WHERE hashed = $1
+	LIMIT 1
 	`
 
+	hashed := fmt.Sprintf("%x", md5.Sum([]byte(original)))
+
 	var row = domain.Link{}
-	err := r.db.QueryRow(query, original).Scan(&row.ID, &row.Original, &row.CreatedAt)
+	err := r.db.QueryRow(query, hashed).Scan(&row.ID, &row.Original, &row.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -148,11 +152,13 @@ func (r *PostgresRepo) FindByOriginal(original string) (*domain.Link, error) {
 
 func (r *PostgresRepo) Create(link *domain.Link) (*domain.Link, error) {
 	query := `
-	INSERT INTO links (id, original, created_at)
-	VALUES ($1, $2, $3)
+	INSERT INTO links (id, hashed, original, created_at)
+	VALUES ($1, $2, $3, $4)
 	`
 
-	_, err := r.db.Exec(query, link.ID, link.Original, link.CreatedAt)
+	hashed := fmt.Sprintf("%x", md5.Sum([]byte(link.Original)))
+
+	_, err := r.db.Exec(query, link.ID, hashed, link.Original, link.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
