@@ -18,7 +18,7 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 }
 
 type linkReq struct {
-	URL string `json:"url" validate:"required,url,max:2048"`
+	URL string `json:"url" validate:"required,url,max=2048"`
 }
 
 type linkResp struct {
