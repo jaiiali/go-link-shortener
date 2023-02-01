@@ -83,9 +83,15 @@ Response:
 }
 ```
 
-### Healthcheck
+### Health
 
 Request:
 ```shell
 curl -X POST http://0.0.0.0:8000/api/health
+```
+
+### Redirect to Original Link
+
+```shell
+curl -i -X GET http://0.0.0.0:8000/{id}
 ```
