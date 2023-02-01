@@ -52,6 +52,10 @@ migrate-create:migrate ## Create new migration file
 migrate-up:migrate ## Apply all up migrations
 	@ $(MIGRATE) $(MIGRATE_CONFIG) up
 
+.PHONY:	migrate-drop
+migrate-drop:migrate ## Drop everything inside database
+	@ $(MIGRATE) $(MIGRATE_CONFIG) drop -f
+
 .PHONY:	migrate-down
 migrate-down:migrate ## Apply all down migrations
 	@ $(MIGRATE) $(MIGRATE_CONFIG) down $(STEP)

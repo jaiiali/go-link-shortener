@@ -6,9 +6,10 @@ import (
 	fiberRecover "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/jaiiali/go-link-shortener/helpers"
 	"github.com/jaiiali/go-link-shortener/internal/core/usecases"
+	"github.com/jaiiali/go-link-shortener/internal/factory"
+	handlerHealth "github.com/jaiiali/go-link-shortener/internal/handlers/health"
 	handlerLink "github.com/jaiiali/go-link-shortener/internal/handlers/link"
 	handlerRedirect "github.com/jaiiali/go-link-shortener/internal/handlers/redirect"
-	repoLink "github.com/jaiiali/go-link-shortener/internal/repositories/link"
 	"github.com/jaiiali/go-link-shortener/pkg/logger"
 )
 
@@ -17,7 +18,7 @@ func main() {
 	defer log.Sync() //nolint: errcheck
 
 	// Repository
-	linkRepo := repoLink.NewMemRepo()
+	linkRepo := factory.NewRepository()
 
 	// UseCase
 	linkUseCase := usecases.NewLinkUseCase(linkRepo, log)
@@ -30,6 +31,7 @@ func main() {
 	handlerRedirect.NewHandler(linkUseCase, app)
 
 	apiGroup := app.Group("/api")
+	handlerHealth.NewHandler(apiGroup)
 	handlerLink.NewHandler(linkUseCase, apiGroup)
 
 	log.Info("Listening...")

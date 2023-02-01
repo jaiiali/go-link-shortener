@@ -1,9 +1,8 @@
-CREATE TABLE IF NOT EXISTS todos(
-    id VARCHAR(26),
-    title VARCHAR(255) NOT NULL,
-    description TEXt NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL
+CREATE TABLE IF NOT EXISTS links(
+    id VARCHAR(10),
+    original VARCHAR(2048) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY(id)
 );
 
-CREATE INDEX todos_created_at_index ON todos (created_at DESC);
+CREATE INDEX links_created_at_index ON links (created_at DESC);
