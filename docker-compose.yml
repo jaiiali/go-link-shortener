@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+
+  # app:
+  #   container_name: app
+  #   build:
+  #     context: .
+  #     dockerfile: docker/Dockerfile
+  #     target: app
+  #   environment:
+  #     - DB_HOST=postgres_db
+  #     - HTTP_PORT=8000
+  #   ports:
+  #     - 8000:8000
+  #   networks:
+  #     - backend
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://0.0.0.0/api/health"]
+
+  postgres_db:
+    image: postgres:14-alpine
+    environment:
+      DATABASE_HOST: "${DB_HOST}"
+      POSTGRES_DB: "${DB_DATABASE}"
+      POSTGRES_USER: "${DB_USERNAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+
+  redis_cache:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+
+networks:
+  backend:
+    driver: bridge
