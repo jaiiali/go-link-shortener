@@ -2,10 +2,12 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/gofiber/fiber/v2/middleware/recover"
+	fiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
+	fiberRecover "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/jaiiali/go-link-shortener/helpers"
 	"github.com/jaiiali/go-link-shortener/internal/core/usecases"
 	handlerLink "github.com/jaiiali/go-link-shortener/internal/handlers/link"
+	handlerRedirect "github.com/jaiiali/go-link-shortener/internal/handlers/redirect"
 	repoLink "github.com/jaiiali/go-link-shortener/internal/repositories/link"
 	"github.com/jaiiali/go-link-shortener/pkg/logger"
 )
@@ -15,17 +17,20 @@ func main() {
 	defer log.Sync() //nolint: errcheck
 
 	// Repository
-	linkRepo := repoLink.NewMemRepo(log)
+	linkRepo := repoLink.NewMemRepo()
 
 	// UseCase
-	todoUseCase := usecases.NewLinkUseCase(linkRepo, log)
+	linkUseCase := usecases.NewLinkUseCase(linkRepo, log)
 
 	app := fiber.New()
-	//app.Use(recover.New())
-	api := app.Group("/api")
+	app.Use(fiberLogger.New())
+	app.Use(fiberRecover.New())
 
 	// Handler
-	handlerLink.NewHandler(todoUseCase, api)
+	handlerRedirect.NewHandler(linkUseCase, app)
+
+	apiGroup := app.Group("/api")
+	handlerLink.NewHandler(linkUseCase, apiGroup)
 
 	log.Info("Listening...")
 	log.Panic(app.Listen(helpers.BuildAddr()))

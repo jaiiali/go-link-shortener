@@ -4,18 +4,15 @@ import (
 	"errors"
 
 	"github.com/jaiiali/go-link-shortener/internal/core/domain"
-	"github.com/jaiiali/go-link-shortener/pkg/logger"
 )
 
 type MemRepo struct {
 	data map[string]memDB
-	log  *logger.Logger
 }
 
-func NewMemRepo(log *logger.Logger) *MemRepo {
+func NewMemRepo() *MemRepo {
 	return &MemRepo{
 		data: make(map[string]memDB),
-		log:  log,
 	}
 }
 
@@ -33,10 +30,7 @@ func (r *MemRepo) FindByID(id string) (*domain.Link, error) {
 		return result.unbind(), nil
 	}
 
-	err := errors.New("link not found")
-	r.log.Error(err)
-
-	return nil, err
+	return nil, errors.New("link not found")
 }
 
 func (r *MemRepo) FindByOriginal(original string) (*domain.Link, error) {
@@ -46,10 +40,7 @@ func (r *MemRepo) FindByOriginal(original string) (*domain.Link, error) {
 		}
 	}
 
-	err := errors.New("link not found")
-	r.log.Error(err)
-
-	return nil, err
+	return nil, errors.New("link not found")
 }
 
 func (r *MemRepo) Create(link *domain.Link) (*domain.Link, error) {
